@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+	<id>com.ronman2009.autoback</id>
+	<metadata_license>CC-BY-SA-3.0</metadata_license>
+	<project_license>GPL-2.0-or-later</project_license>
+	<name>autoBack</name>
+	<summary>System snapshot &amp; restore with an integrated independent rescue system</summary>
+
+	<description>
+		<p>
+			autoBack protects your system by taking btrfs snapshots that
+			automatically carry a consistent GRUB/ESP archive, so the bootloader
+			travels together with the system on every restore.
+		</p>
+		<p>
+			It also builds and installs an independent rescue system (EFISTUB UKI)
+			directly from the firmware boot entry - capable of restoring the system
+			even when GRUB and the OS itself are broken.
+		</p>
+		<p>
+			autoBack is a deep fork of Timeshift and is NOT a backup tool for
+			user data; users' home directories are excluded by default.
+		</p>
+	</description>
+
+	<url type="homepage">https://github.com/ronman2009/autoBack</url>
+	<developer_name>ronman2009</developer_name>
+	<releases>
+		<release version="1.0" date="2026-09-27">
+			<description>
+				<p>Initial release: Timeshift deep fork with automatic ESP/GRUB
+				snapshot archives and integrated rescue system installer.</p>
+			</description>
+		</release>
+	</releases>
+	<content_rating type="oars-1.1"/>
+</component>

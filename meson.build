@@ -48,6 +48,6 @@ if enable_man
 endif
 
 install_data(
-  sources: 'debian/com.linuxmint.timeshift.metainfo.xml',
+  sources: 'debian/com.ronman2009.autoback.metainfo.xml',
   install_dir: join_paths(get_option('datadir'), 'metainfo')
 )
