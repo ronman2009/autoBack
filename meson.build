@@ -29,7 +29,6 @@ if enable_xapp
 endif
 
 # Include the translations module
-i18n = import('i18n')
 
 am_cflags = [
   '-fstack-protector',
@@ -40,14 +39,9 @@ add_project_arguments('-D', 'GTK3_18', language: 'vala')
 
 subdir('files')
 subdir('src')
-subdir('po')
 
-enable_man = get_option('man')
-if enable_man
-  subdir('docs/man')
-endif
 
 install_data(
-  sources: 'debian/com.ronman2009.autoback.metainfo.xml',
+  sources: 'src/share/metainfo/com.ronman2009.autoback.metainfo.xml',
   install_dir: join_paths(get_option('datadir'), 'metainfo')
 )

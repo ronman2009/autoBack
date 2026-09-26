@@ -2,41 +2,47 @@
 
 [![License: GPL-2.0](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](COPYING)
 [![Based on Timeshift](https://img.shields.io/badge/based%20on-Timeshift-3465a4)](https://github.com/linuxmint/timeshift)
-[![Platform](https://img.shields.io/badge/platform-Linux%20btrfs-blue)](#requirements)
+[![Platform](https://img.shields.io/badge/platform-Linux%20btrfs-blue)](#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B)
 
-**System snapshot & restore with an integrated independent rescue system.**
+**系统快照与还原，内置独立救援系统——GRUB 和主系统全坏了也能从固件恢复。**
 
-autoBack is a **deep fork of [Timeshift](https://github.com/linuxmint/timeshift)**
-(GPL-2.0-or-later). Everything Timeshift does for btrfs snapshot management works
-here — plus the two things Timeshift will never do:
+autoBack 是 [Timeshift](https://github.com/linuxmint/timeshift)（GPL-2.0-or-later）
+的深度改装版。Timeshift 的全部 btrfs 快照管理能力照常工作，另外补上了
+Timeshift 永远不会做的两件事。
 
-## What autoBack adds
+## 这解决什么问题
 
-### 1. Snapshots carry GRUB automatically
+Timeshift 能回滚系统，但它自己活在主系统里；GRUB 负责引导，却也是最容易坏的环节。
+主系统起不来的时候，Timeshift 无能为力——而且回滚后 GRUB 与 `/boot/grub`
+的版本错配甚至可能让回滚本身毁掉系统。
 
-Every btrfs snapshot automatically includes a **consistent ESP archive**
-(`@/.recovery/esp-<ts>.tar.gz`) taken *before* the snapshot is created —
-so the bootloader (`grubx64.efi`) always travels with the system it belongs to.
-Restoring a snapshot can never break the bootloader through version mismatch,
-and deleting a snapshot cleans up its archive automatically.
+| 场景 | Timeshift | autoBack |
+|---|---|---|
+| 系统正常，日常回滚 | ✅ 主场 | ✅ 同样能力 |
+| **GRUB / 内核 / 主系统全挂** | ❌ 它自己就活在主系统里 | ✅ 固件直引，唯一手段 |
+| GRUB 版本与 /boot/grub 错配 | ❌ 无处理 | ✅ 每个快照自动携带 ESP 归档 |
+| 删除快照的清理 | ✅ | ✅ 归档随快照自动一并删除 |
 
-### 2. Integrated Rescue System panel
+## autoBack 加了什么
 
-One-click build and firmware installation of an **independent rescue system**
-(EFISTUB UKI: kernel + musl busybox + btrfs-progs):
+### 1. 快照自动携带 GRUB
 
-- Boots directly from UEFI — **no GRUB, no OS required**
-- Restores the system from any snapshot even when GRUB and the OS are broken
-- `--recover` self-heal mode for torn-down state
+每次创建 btrfs 快照**之前**，ESP（含 `grubx64.efi`）会先被打包进
+`@/.recovery/esp-<ts>.tar.gz`——归档与快照原子锁定在同一时刻。
+回滚到哪个时刻，引导器就是哪个时刻的版本，杜绝版本错配毁系统。
 
-Toolbar → **Rescue System** → Build → Install → done.
+### 2. 内置救援系统面板
 
-## Requirements
+主窗口工具栏 **Rescue System** 一键构建并安装独立救援系统
+（EFISTUB UKI：内核 + musl busybox + btrfs-progs）：
 
-- Linux with btrfs root (`@` subvolume layout, Timeshift btrfs mode compatible)
-- UEFI boot, no disk encryption
+- 直接从 UEFI 固件引导——**不需要 GRUB，不需要主系统**
+- 主系统全挂时从任意快照还原，支持 `--recover` 拆解态自愈
+- 构建日志内嵌显示，状态自检一键完成
 
-## Build & Install
+## 快速开始
+
+**前提**：Linux + btrfs 根分区（`@` 子卷布局，兼容 Timeshift btrfs 模式）、UEFI 启动。
 
 ```bash
 meson setup build -Dman=false
@@ -44,16 +50,23 @@ ninja -C build
 sudo ninja -C build install
 ```
 
-Rescue system build scripts (kernel pinning, UKI assembly, ESP install)
-are expected under `/usr/share/autoback/rescue` — see the
-[development kit](https://github.com/ronman2009/allAuto-rollBack-inBios).
+救援系统构建脚本（内核钉入、UKI 组装、ESP 安装）需安装到
+`/usr/share/autoback/rescue`——见
+[开发套件仓库 allAuto-rollBack-inBios](https://github.com/ronman2009/allAuto-rollBack-inBios)。
 
-## Credits
+## 边界
 
-- **autoBack** maintained by [ronman2009](https://github.com/ronman2009)
-- Based on **Timeshift** by [Tony George](https://github.com/teejeetech) / Linux Mint
-- Rescue system design inspired by [ZFSBootMenu](https://zfsbootmenu.org)
+- ⚠️ 不保护用户数据：`@home` 默认排除（与 Timeshift 相同）
+- ⚠️ 救援内核版本与镜像写死：主系统升级内核后需重新构建
+- ⚠️ 不承诺硬件级灾难：固件损坏、磁盘故障无解
+- 🔄 仅支持 btrfs 模式，不支持 rsync 模式
 
-## License
+## 致谢
 
-GPL-2.0-or-later (inherited from Timeshift)
+- **autoBack** 由 [ronman2009](https://github.com/ronman2009) 维护
+- 基于 **Timeshift**（[Tony George](https://github.com/teejeetech) / Linux Mint）深度改装
+- 救援系统设计灵感来自 [ZFSBootMenu](https://zfsbootmenu.org)
+
+## 许可证
+
+GPL-2.0-or-later（继承自 Timeshift，衍生作品依法沿用）
